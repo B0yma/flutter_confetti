@@ -265,6 +265,7 @@ class Particle {
     final dragMagnitude = _particleDrag * speed * speed;
     final drag = _velocity.clone()
       ..multiply(vmath.Vector2.all(-1))
+      ..normalize()
       ..multiply(vmath.Vector2.all(dragMagnitude));
     applyForce(drag);
   }
