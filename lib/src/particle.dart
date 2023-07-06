@@ -465,7 +465,6 @@ class Particle {
       _aVelocityZ += _aAcceleration;
     }
 
-    print("stopAt: ${_stopAtY} current: ${_location.y}");
     if (_stopAtY != null && _location.y >= _stopAtY!) {
       _pause = true;
       _forceToDraw = true;
