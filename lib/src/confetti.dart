@@ -204,6 +204,11 @@ class _ConfettiWidgetState extends State<ConfettiWidget>
   }
 
   void _handleChange() {
+    _stopEmissionForNumberOfParticles(
+        widget.confettiController._numberOfParticlesToStop,
+        maxY: widget.confettiController._maxYToStop,
+        minY: widget.confettiController._minYToStop);
+
     if (widget.confettiController.state == ConfettiControllerState.playing) {
       _startAnimation();
       _startEmission();
@@ -270,6 +275,11 @@ class _ConfettiWidgetState extends State<ConfettiWidget>
       return;
     }
     _particleSystem.stopParticleEmission(clearAllParticles: clearAllParticles);
+  }
+
+  void _stopEmissionForNumberOfParticles(int number,
+      {double minY = 0, double maxY = 1000}) {
+    _particleSystem.stopNumberOfParticleEmission(number, minY, maxY);
   }
 
   void _startAnimation() {
@@ -446,6 +456,10 @@ class ConfettiController extends ChangeNotifier {
   Duration duration;
 
   ConfettiControllerState _state = ConfettiControllerState.stopped;
+  int _numberOfParticlesToStop = 0;
+
+  double _minYToStop = 0;
+  double _maxYToStop = 1000;
 
   /// {@macro confetti_controller_state}
   ConfettiControllerState get state => _state;
@@ -453,7 +467,11 @@ class ConfettiController extends ChangeNotifier {
   /// {@macro particle_stats_callback}
   final ParticleStatsCallback? particleStatsCallback;
 
-  void play() {
+  void play(
+      {int numberOfParticlesToStop = 0, double minYToStop = 0, double maxYToStop = 1000}) {
+    _numberOfParticlesToStop = numberOfParticlesToStop;
+    _minYToStop = minYToStop;
+    _maxYToStop = maxYToStop;
     _state = ConfettiControllerState.playing;
     notifyListeners();
   }

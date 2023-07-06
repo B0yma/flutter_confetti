@@ -95,6 +95,10 @@ class ParticleSystem extends ChangeNotifier {
 
   final Random _rand;
 
+  int _numberOfParticlesToStop = 0;
+  double _minYToStop = 0;
+  double _maxYToStop = 1000;
+
   set particleSystemPosition(Offset position) {
     _particleSystemPosition = position;
   }
@@ -110,6 +114,12 @@ class ParticleSystem extends ChangeNotifier {
     if (clearAllParticles) {
       _particles.clear();
     }
+  }
+
+  void stopNumberOfParticleEmission(int number, double minY, double maxY) {
+    _numberOfParticlesToStop = number;
+    _minYToStop = minY;
+    _maxYToStop = maxY;
   }
 
   void startParticleEmission() {
@@ -169,6 +179,11 @@ class ParticleSystem extends ChangeNotifier {
       // This also ensures that particles are emitted on the first frame
       if (particles.isEmpty) {
         _addParticles(_particles, number: _numberOfParticles);
+        for (int i = 0; i < _numberOfParticlesToStop; i++) {
+          if (i >= _particles.length) return;
+          _particles[i].stopAtY =
+              _rand.nextDouble() * (_maxYToStop - _minYToStop) + _minYToStop;
+        }
         return;
       }
 
@@ -330,7 +345,25 @@ class Particle {
   final Path _pathShape;
 
   bool _active;
+
   bool get active => _active;
+
+  bool _forceToDraw = false;
+  bool _pause = false;
+
+  double? _stopAtY;
+
+  double? get stopAtY => _stopAtY;
+
+  void set stopAtY(double? value) => _stopAtY = value;
+
+  bool get forceToDraw => _forceToDraw;
+
+  void set forceToDraw(bool value) => _forceToDraw = value;
+
+  bool get pause => _pause;
+
+  void set pause(bool value) => _pause = value;
 
   final bool _rotateZ;
 
@@ -402,6 +435,8 @@ class Particle {
   }
 
   void update(double deltaTime) {
+    if (_pause) return;
+
     final deltaTimeSpeed = deltaTime * desiredSpeed;
     drag(deltaTimeSpeed);
 
@@ -429,6 +464,12 @@ class Particle {
       _aZ += _aVelocityZ * deltaTimeSpeed;
       _aVelocityZ += _aAcceleration;
     }
+
+    print("stopAt: ${_stopAtY} current: ${_location.y}");
+    if (_stopAtY != null && _location.y >= _stopAtY!) {
+      _pause = true;
+      _forceToDraw = true;
+    }
   }
 
   Offset get location {
@@ -439,10 +480,13 @@ class Particle {
   }
 
   Color get color => _color;
+
   Path get path => _pathShape;
 
   double get angleX => _aX;
+
   double get angleY => _aY;
+
   double get angleZ => _aZ;
 
   bool get rotateZ => _rotateZ;
