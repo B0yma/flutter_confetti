@@ -179,11 +179,16 @@ class ParticleSystem extends ChangeNotifier {
       // This also ensures that particles are emitted on the first frame
       if (particles.isEmpty) {
         _addParticles(_particles, number: _numberOfParticles);
-        for (int i = 0; i < _numberOfParticlesToStop; i++) {
-          if (i >= _particles.length) return;
-          _particles[i].stopAtY =
-              _rand.nextDouble() * (_maxYToStop - _minYToStop) + _minYToStop;
-        }
+        Future.delayed(Duration(milliseconds: 1000), () {
+          _particles.sort(
+            (a, b) => a.location.dy.compareTo(b.location.dy),
+          );
+          for (int i = 0; i < _numberOfParticlesToStop; i++) {
+            if (i >= _particles.length) return;
+            _particles[i].stopAtY =
+                _rand.nextDouble() * (_maxYToStop - _minYToStop) + _minYToStop;
+          }
+        });
         return;
       }
 
