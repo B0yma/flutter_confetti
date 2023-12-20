@@ -362,6 +362,7 @@ class _ConfettiWidgetState extends State<ConfettiWidget>
     _animController.dispose();
     widget.confettiController.removeListener(_handleChange);
     _particleSystem.removeListener(_particleSystemListener);
+    _particleSystem.dispose();
     super.dispose();
   }
 }
